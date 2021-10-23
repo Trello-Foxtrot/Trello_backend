@@ -6,5 +6,6 @@ from django.http import HttpResponse
 
 
 def homePageView(request, msg='0'):
-    msg = msg.upper()
-    return HttpResponse(msg)
+    res = HttpResponse(msg.upper())
+    res["Access-Control-Allow-Origin"] = "*"
+    return res

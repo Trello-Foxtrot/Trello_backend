@@ -1,7 +1,7 @@
 from django.urls import path
-from .views import homePageView
+from .views import login
 
 
 urlpatterns = [
-    path('<str:msg>', homePageView, name='login')
+    path('', login, name='login')
 ]

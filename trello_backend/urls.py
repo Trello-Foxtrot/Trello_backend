@@ -3,5 +3,5 @@ from .views import homePageView
 
 
 urlpatterns = [
-    path('<str:msg>', homePageView, name='home')
+    path('<str:msg>', homePageView, name='login')
 ]

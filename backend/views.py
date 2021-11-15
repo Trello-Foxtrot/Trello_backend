@@ -1,12 +1,9 @@
-from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
 
 from backend.models import User
-
-import json
 
 
 @csrf_exempt
@@ -15,14 +12,14 @@ def login(request):
     user.email = request.POST.get('email')
     user.password = request.POST.get('password')
 
-    data = {}
-    if User.objects.filter(email=user.email).filter(password=user.password):
-        data['email'] = ''
-    else:
-        data['email'] = "User doesn't exists or given password is wrong"
-
-    res = JsonResponse(data)
+    res = HttpResponse()
     res['Access-Control-Allow-Origin'] = '*'
+    res['Access-Control-Expose-Headers'] = '*'
+    if User.objects.filter(email=user.email).filter(password=user.password):
+        res['email'] = ''
+    else:
+        res['email'] = "User doesn't exists or given password is wrong"
+
     return res
 
 
@@ -32,14 +29,14 @@ def sign_up(request):
     user.email = request.POST.get('email')
     user.password = request.POST.get('password')
 
-    data = {}
+    res = HttpResponse()
+    res['Access-Control-Allow-Origin'] = '*'
+    res['Access-Control-Expose-Headers'] = '*'
     if not User.objects.filter(email=user.email):
         user.save()
-        data['email'] = ''
+        res['email'] = ''
     else:
-        data['email'] = 'User already exists'
+        res['email'] = 'User already exists'
 
-    res = JsonResponse(data)
-    res['Access-Control-Allow-Origin'] = '*'
     return res
 

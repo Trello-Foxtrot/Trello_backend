@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Login to trello</title>
+</head>
+<body>
+	<center>
+		<h1>Login to Trello</h1>
+        <br>
+		<form action="" method="POST">
+			<table>
+				{% csrf_token %}
+				<tr>
+					<th align="right"><label>Email:</label></th>
+					<th align="left"><input name="guest_email" size="11" type="text"></th>
+				</tr>
+				<tr>
+					<th align="right"><label>Password:</label></th>
+					<th align="left"><input name="guest_password" size="11" type="text"></th>
+				</tr>
+			</table><br>
+			<br>
+			<input type="submit" value="Submit"/>
+		</form>
+	</center>
+</body>
+</html>

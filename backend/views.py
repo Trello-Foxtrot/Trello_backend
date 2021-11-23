@@ -18,7 +18,7 @@ def login(request):
     if User.objects.filter(email=user.email).filter(password=user.password):
         res['email'] = ''
     else:
-        res['email'] = "User doesn't exists or given password is wrong"
+        res['email'] = "Email or password is incorrect"
 
     return res
 

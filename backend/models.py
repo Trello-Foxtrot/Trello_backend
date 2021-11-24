@@ -26,12 +26,12 @@ class Card(models.Model):
 
 
 class Admin(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    board = models.ForeignKey(Board, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    board = models.ForeignKey(Board, on_delete=models.CASCADE, blank=True, null=True)
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE)
 
 
 class Member(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     board = models.ManyToManyField(Board)
     workspace = models.ManyToManyField(Workspace)

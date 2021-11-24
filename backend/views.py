@@ -49,23 +49,31 @@ def get_workspaces(request):
     res['Access-Control-Allow-Origin'] = '*'
     res['Access-Control-Expose-Headers'] = '*'
 
-    w_admin = Admin.objects.get(user__email=request.session['email']).values_list('workspace__name')
-    w_guest = Member.objects.get(user__email=request.session['email']).values_list('workspace__name')
-    print(w_admin)
-    print(w_guest)
-    res['admin'] = w_admin.workspace
-    res['guest'] = w_guest.workspace
+    w_admin = Admin.objects.filter(user__email=request.session['email']).values_list('workspace__name')
+    w_guest = Member.objects.filter(user__email=request.session['email']).values_list('workspace__name')
 
-    return None
-    # return res
+    res['admin'] = ""
+    for w in w_admin:
+        res['admin'] += w[0] + ','
+    res['admin'] = res['admin'][:-1]
+
+    res['guest'] = ""
+    for w in w_guest:
+        res['guest'] += w[0] + ','
+    res['guest'] = res['guest'][:-1]
+
+    return res
 
 
 @csrf_exempt
 def add_workspace(request):
+    res = HttpResponse()
+    res['Access-Control-Allow-Origin'] = '*'
+    res['Access-Control-Expose-Headers'] = '*'
+
     new_workspace = Workspace(name=request.POST.get('name'))
     admin = Admin(user=User.objects.get(email=request.session['email']), workspace=new_workspace)
-
     new_workspace.save()
     admin.save()
-    return None
+    return res
     # return res

@@ -50,9 +50,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-SESSION_COOKIE_DOMAIN = "."
-
 ROOT_URLCONF = 'trello.urls'
 
 TEMPLATES = [

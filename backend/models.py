@@ -7,21 +7,21 @@ class User(models.Model):
 
 
 class Workspace(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50, unique=False)
 
 
 class Board(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50, unique=False)
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE)
 
 
 class List(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50, unique=False)
     board = models.ForeignKey(Board, on_delete=models.CASCADE)
 
 
 class Card(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50, unique=False)
     list = models.ForeignKey(List, on_delete=models.CASCADE)
 
 

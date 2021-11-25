@@ -44,29 +44,38 @@ def sign_up(request):
 
 
 @csrf_exempt
-def get_workspaces(request):
+def get_workspace(request):
+    # debug
+    request.session['email'] = 'a'
+
     res = HttpResponse()
     res['Access-Control-Allow-Origin'] = '*'
     res['Access-Control-Expose-Headers'] = '*'
 
-    w_admin = Admin.objects.filter(user__email=request.session['email']).values_list('workspace__name')
-    w_guest = Member.objects.filter(user__email=request.session['email']).values_list('workspace__name')
+    w_admin = Admin.objects.filter(user__email=request.session['email']).values_list('workspace__name', 'workspace__pk')
+    w_guest = Member.objects.filter(user__email=request.session['email']).values_list('workspace__name',
+                                                                                      'workspace__pk')
 
     res['admin'] = ""
+    res['admin_id'] = ""
     for w in w_admin:
         res['admin'] += w[0] + ','
-    res['admin'] = res['admin'][:-1]
+        res['admin_id'] += str(w[1]) + ','
 
     res['guest'] = ""
+    res['guest_id'] = ""
     for w in w_guest:
         res['guest'] += w[0] + ','
-    res['guest'] = res['guest'][:-1]
+        res['guest_id'] += str(w[1]) + ','
 
     return res
 
 
 @csrf_exempt
 def add_workspace(request):
+    # debug
+    request.session['email'] = 'a'
+
     res = HttpResponse()
     res['Access-Control-Allow-Origin'] = '*'
     res['Access-Control-Expose-Headers'] = '*'
@@ -76,4 +85,98 @@ def add_workspace(request):
     new_workspace.save()
     admin.save()
     return res
-    # return res
+
+
+@csrf_exempt
+def delete_workspace(request):
+    # debug
+    request.session['email'] = 'a'
+
+    res = HttpResponse()
+    res['Access-Control-Allow-Origin'] = '*'
+    res['Access-Control-Expose-Headers'] = '*'
+
+    Admin.objects.get(
+        user__email=request.session['email'],
+        workspace__pk=request.POST.get('id')
+    ).delete()
+
+    return res
+
+
+@csrf_exempt
+def rename_workspace(request):
+    # debug
+    request.session['email'] = 'a'
+
+    res = HttpResponse()
+    res['Access-Control-Allow-Origin'] = '*'
+    res['Access-Control-Expose-Headers'] = '*'
+
+    workspace = Admin.objects.get(
+        user__email=request.session['email'],
+        workspace__pk=request.POST.get('id')
+    ).workspace
+    print(workspace)
+    workspace.name = request.POST.get('new_name')
+    workspace.save()
+    print(workspace.name)
+    return res
+
+
+@csrf_exempt
+def get_workspace_members(request):
+    # debug
+    request.session['email'] = 'a'
+
+    res = HttpResponse()
+    res['Access-Control-Allow-Origin'] = '*'
+    res['Access-Control-Expose-Headers'] = '*'
+
+    members = []
+    try:
+        members.append(
+            Admin.objects.get(workspace__pk=request.POST.get('id')).user.email
+        )
+    except:
+        pass
+
+    members += Member.objects.filter(workspace__pk=request.POST.get('id')).values_list('user__email')
+
+    res['members'] = ""
+    for m in members:
+        res['members'] += m + ','
+
+    return res
+
+
+@csrf_exempt
+def get_workspace_boards(request):
+    # debug
+    request.session['email'] = 'a'
+
+    res = HttpResponse()
+    res['Access-Control-Allow-Origin'] = '*'
+    res['Access-Control-Expose-Headers'] = '*'
+
+    boards = []
+    try:
+        boards.append(
+            Admin.objects.get(
+                user__email=request.session['email'],
+                workspace__pk=request.POST.get('id')
+            ).board.name
+        )
+    except:
+        pass
+
+    boards += Member.objects.filter(
+            user__email=request.session['email'],
+            workspace__pk=request.POST.get('id')
+        ).values_list('board__name')
+
+    res['boards'] = ""
+    for b in boards:
+        res['boards'] += b + ','
+
+    return res

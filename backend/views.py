@@ -8,14 +8,20 @@ from backend.models import User, Workspace, Admin, Member
 
 @csrf_exempt
 def login(request):
-    user = User()
-    user.email = request.POST.get('email')
-    user.password = request.POST.get('password')
+    # user = User()
+    # user.email = request.POST.get('email')
+    # user.password = request.POST.get('password')
 
     res = HttpResponse()
     res['Access-Control-Allow-Origin'] = '*'
     res['Access-Control-Expose-Headers'] = '*'
-    if User.objects.filter(email=user.email).filter(password=user.password):
+
+    email = request.POST['email']
+    password = request.POST['password']
+    user = authenticate(request, username=email, password=password)
+
+    # if User.objects.filter(email=user.email).filter(password=user.password):
+    if user is not None:
         request.session['email'] = user.email
         res['email'] = ''
     else:
@@ -26,9 +32,11 @@ def login(request):
 
 @csrf_exempt
 def sign_up(request):
-    user = User()
-    user.email = request.POST.get('email')
-    user.password = request.POST.get('password')
+    # user = User()
+    # user.email = request.POST.get('email')
+    # user.password =
+
+    user = User.objects.create_user(request.POST.get('email'), request.POST.get('email'), request.POST.get('password'))
 
     res = HttpResponse()
     res['Access-Control-Allow-Origin'] = '*'

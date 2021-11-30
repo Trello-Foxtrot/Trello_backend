@@ -1,190 +1,237 @@
+import json
+
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
 from django.http import HttpResponse
 
-# Create your views here.
 from django.views.decorators.csrf import csrf_exempt
 
-from backend.models import User, Workspace, Admin, Member
+from backend.models import Workspace, Admin, Member
+
+
+def add_headers(res, req):
+    res['Access-Control-Allow-Origin'] = req.headers['Origin']
+    res['Access-Control-Expose-Headers'] = '*'
+    res['Access-Control-Allow-Credentials'] = 'true'
+    res['Access-Control-Allow-Headers'] = 'access-control-allow-origin, access-control-expose-headers, access-control-allow-credentials, content-type'
+    return res
 
 
 @csrf_exempt
-def login(request):
-    # user = User()
-    # user.email = request.POST.get('email')
-    # user.password = request.POST.get('password')
+def sign_in(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        res_data = {}
+
+        res = HttpResponse(content_type="application/json; charset=UTF-8")
+        res = add_headers(res, request)
+
+        email = data['email']
+        password = data['password']
+        user = authenticate(request, username=email, password=password)
+
+        if user is not None:
+            login(request, user)
+            res_data['email'] = ""
+        else:
+            res_data['email'] = "Email or password is incorrect"
+
+        res.write(json.dumps(res_data))
+        return res
 
     res = HttpResponse()
-    res['Access-Control-Allow-Origin'] = '*'
-    res['Access-Control-Expose-Headers'] = '*'
-
-    email = request.POST['email']
-    password = request.POST['password']
-    user = authenticate(request, username=email, password=password)
-
-    # if User.objects.filter(email=user.email).filter(password=user.password):
-    if user is not None:
-        request.session['email'] = user.email
-        res['email'] = ''
-    else:
-        res['email'] = "Email or password is incorrect"
-
+    res = add_headers(res, request)
     return res
 
 
 @csrf_exempt
 def sign_up(request):
-    # user = User()
-    # user.email = request.POST.get('email')
-    # user.password =
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        res_data = {}
 
-    user = User.objects.create_user(request.POST.get('email'), request.POST.get('email'), request.POST.get('password'))
+        email = data['email']
+        password = data['password']
+
+        res = HttpResponse(content_type="application/json; charset=UTF-8")
+        res = add_headers(res, request)
+
+        if not User.objects.filter(username=email).exists():
+            user = User.objects.create_user(email, email, password)
+            user.save()
+            login(request, user)
+            res_data['email'] = ''
+        else:
+            res_data['email'] = 'User already exists'
+
+        res.write(json.dumps(res_data))
+        return res
 
     res = HttpResponse()
-    res['Access-Control-Allow-Origin'] = '*'
-    res['Access-Control-Expose-Headers'] = '*'
-    if not User.objects.filter(email=user.email):
-        user.save()
-        request.session['email'] = user.email
-        res['email'] = ''
-    else:
-        res['email'] = 'User already exists'
-
+    res = add_headers(res, request)
     return res
 
 
 @csrf_exempt
 def get_workspace(request):
-    # debug
-    request.session['email'] = 'a'
+    if request.method == 'POST':
+        res_data = {}
+
+        print(request.user)
+
+        res = HttpResponse(content_type="application/json; charset=UTF-8")
+        res = add_headers(res, request)
+
+        w_admin = Admin.objects.filter(user__username=request.user.username).values_list('workspace__name', 'workspace__pk')
+        w_guest = Member.objects.filter(user__username=request.user.username).values_list('workspace__name',
+                                                                                          'workspace__pk')
+
+        res_data['admin'] = ""
+        res_data['admin_id'] = ""
+        for w in w_admin:
+            res_data['admin'] += w[0] + ','
+            res_data['admin_id'] += str(w[1]) + ','
+
+        res_data['guest'] = ""
+        res_data['guest_id'] = ""
+        for w in w_guest:
+            res_data['guest'] += w[0] + ','
+            res_data['guest_id'] += str(w[1]) + ','
+
+        res.write(json.dumps(res_data))
+        return res
 
     res = HttpResponse()
-    res['Access-Control-Allow-Origin'] = '*'
-    res['Access-Control-Expose-Headers'] = '*'
-
-    w_admin = Admin.objects.filter(user__email=request.session['email']).values_list('workspace__name', 'workspace__pk')
-    w_guest = Member.objects.filter(user__email=request.session['email']).values_list('workspace__name',
-                                                                                      'workspace__pk')
-
-    res['admin'] = ""
-    res['admin_id'] = ""
-    for w in w_admin:
-        res['admin'] += w[0] + ','
-        res['admin_id'] += str(w[1]) + ','
-
-    res['guest'] = ""
-    res['guest_id'] = ""
-    for w in w_guest:
-        res['guest'] += w[0] + ','
-        res['guest_id'] += str(w[1]) + ','
-
+    res = add_headers(res, request)
     return res
 
 
 @csrf_exempt
 def add_workspace(request):
-    # debug
-    request.session['email'] = 'a'
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+
+        res = HttpResponse(content_type="application/json; charset=UTF-8")
+        res = add_headers(res, request)
+
+        new_workspace = Workspace(name=data['name'])
+        admin = Admin(user=request.user, workspace=new_workspace)
+        new_workspace.save()
+        admin.save()
+
+        return res
 
     res = HttpResponse()
-    res['Access-Control-Allow-Origin'] = '*'
-    res['Access-Control-Expose-Headers'] = '*'
-
-    new_workspace = Workspace(name=request.POST.get('name'))
-    admin = Admin(user=User.objects.get(email=request.session['email']), workspace=new_workspace)
-    new_workspace.save()
-    admin.save()
+    res = add_headers(res, request)
     return res
 
 
 @csrf_exempt
 def delete_workspace(request):
-    # debug
-    request.session['email'] = 'a'
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+
+        res = HttpResponse(content_type="application/json; charset=UTF-8")
+        res = add_headers(res, request)
+
+        Admin.objects.get(
+            user__username=request.user.username,
+            workspace__pk=data['id']
+        ).delete()
+
+        return res
 
     res = HttpResponse()
-    res['Access-Control-Allow-Origin'] = '*'
-    res['Access-Control-Expose-Headers'] = '*'
-
-    Admin.objects.get(
-        user__email=request.session['email'],
-        workspace__pk=request.POST.get('id')
-    ).delete()
-
+    res = add_headers(res, request)
     return res
 
 
 @csrf_exempt
 def rename_workspace(request):
-    # debug
-    request.session['email'] = 'a'
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+
+        res = HttpResponse(content_type="application/json; charset=UTF-8")
+        res = add_headers(res, request)
+
+        workspace = Admin.objects.get(
+            user__username=request.user.username,
+            workspace__pk=data['id']
+        ).workspace
+
+        workspace.name = data['new_name']
+        workspace.save()
+
+        return res
 
     res = HttpResponse()
-    res['Access-Control-Allow-Origin'] = '*'
-    res['Access-Control-Expose-Headers'] = '*'
-
-    workspace = Admin.objects.get(
-        user__email=request.session['email'],
-        workspace__pk=request.POST.get('id')
-    ).workspace
-    print(workspace)
-    workspace.name = request.POST.get('new_name')
-    workspace.save()
-    print(workspace.name)
+    res = add_headers(res, request)
     return res
 
 
 @csrf_exempt
 def get_workspace_members(request):
-    # debug
-    request.session['email'] = 'a'
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        res_data = {}
+
+        res = HttpResponse(content_type="application/json; charset=UTF-8")
+        res = add_headers(res, request)
+
+        members = []
+        try:
+            members.append(
+                Admin.objects.get(workspace__pk=data['id']).user.username
+            )
+        except:
+            pass
+
+        members += Member.objects.filter(workspace__pk=data['id']).values_list('user__username')
+
+        res_data['members'] = ""
+        for m in members:
+            res_data['members'] += m + ','
+
+        res.write(json.dumps(res_data))
+        return res
 
     res = HttpResponse()
-    res['Access-Control-Allow-Origin'] = '*'
-    res['Access-Control-Expose-Headers'] = '*'
-
-    members = []
-    try:
-        members.append(
-            Admin.objects.get(workspace__pk=request.POST.get('id')).user.email
-        )
-    except:
-        pass
-
-    members += Member.objects.filter(workspace__pk=request.POST.get('id')).values_list('user__email')
-
-    res['members'] = ""
-    for m in members:
-        res['members'] += m + ','
-
+    res = add_headers(res, request)
     return res
 
 
 @csrf_exempt
 def get_workspace_boards(request):
-    # debug
-    request.session['email'] = 'a'
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        res_data = {}
+
+        res = HttpResponse(content_type="application/json; charset=UTF-8")
+        res = add_headers(res, request)
+
+        boards = []
+        try:
+            boards.append(
+                Admin.objects.get(
+                    user__username=request.user.username,
+                    workspace__pk=data['id']
+                ).board.name
+            )
+        except:
+            pass
+
+        boards += Member.objects.filter(
+                user__username=request.user.username,
+                workspace__pk=data['id']
+            ).values_list('board__name')
+
+        res_data['boards'] = ""
+        for b in boards:
+            res_data['boards'] += b + ','
+
+        res.write(json.dumps(res_data))
+        return res
 
     res = HttpResponse()
-    res['Access-Control-Allow-Origin'] = '*'
-    res['Access-Control-Expose-Headers'] = '*'
-
-    boards = []
-    try:
-        boards.append(
-            Admin.objects.get(
-                user__email=request.session['email'],
-                workspace__pk=request.POST.get('id')
-            ).board.name
-        )
-    except:
-        pass
-
-    boards += Member.objects.filter(
-            user__email=request.session['email'],
-            workspace__pk=request.POST.get('id')
-        ).values_list('board__name')
-
-    res['boards'] = ""
-    for b in boards:
-        res['boards'] += b + ','
-
+    res = add_headers(res, request)
     return res

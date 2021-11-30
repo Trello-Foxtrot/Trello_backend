@@ -77,8 +77,6 @@ def get_workspace(request):
     if request.method == 'POST':
         res_data = {}
 
-        print(request.user)
-
         res = HttpResponse(content_type="application/json; charset=UTF-8")
         res = add_headers(res, request)
 

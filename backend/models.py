@@ -18,16 +18,16 @@ class List(models.Model):
 
 class Card(models.Model):
     name = models.CharField(max_length=200, unique=True)
-    list = models.ForeignKey(List, on_delete=models.CASCADE)
+    list = models.ForeignKey(List, on_delete=models.CASCADE, null=True)
 
 
 class Admin(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    board = models.ForeignKey(Board, on_delete=models.CASCADE)
-    workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE)
+    board = models.ForeignKey(Board, on_delete=models.CASCADE, null=True)
+    workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, null=True)
 
 
 class Member(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    board = models.ManyToManyField(Board)
-    workspace = models.ManyToManyField(Workspace)
+    board = models.ManyToManyField(Board, null=True)
+    workspace = models.ManyToManyField(Workspace, null=True)

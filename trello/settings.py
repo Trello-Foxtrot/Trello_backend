@@ -38,19 +38,23 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'backend',
+    'sslserver',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'trello.urls'
+SESSION_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True
+# SESSION_COOKIE_HTTPONLY = False
+SESSION_COOKIE_SAMESITE = 'None'
 
 TEMPLATES = [
     {

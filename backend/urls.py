@@ -9,5 +9,6 @@ urlpatterns = [
     path('workspace/delete', views.delete_workspace),
     path('workspace/rename', views.rename_workspace),
     path('workspace/members', views.get_workspace_members),
-    path('workspace/boards', views.get_workspace_boards)
+    path('workspace/boards', views.get_workspace_boards),
+    path('workspace/boards/add', views.add_workspace_board)
 ]

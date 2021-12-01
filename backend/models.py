@@ -23,11 +23,11 @@ class Card(models.Model):
 
 class Admin(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    board = models.ForeignKey(Board, on_delete=models.CASCADE, null=True)
+    # board = models.ForeignKey(Board, on_delete=models.CASCADE, null=True)
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, null=True)
 
 
 class Member(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    board = models.ManyToManyField(Board, null=True)
+    # board = models.ManyToManyField(Board, null=True)
     workspace = models.ManyToManyField(Workspace, null=True)

@@ -6,7 +6,7 @@ from django.http import HttpResponse
 
 from django.views.decorators.csrf import csrf_exempt
 
-from backend.models import Workspace, Admin, Member
+from backend.models import Workspace, Admin, Member, Board
 
 
 def add_headers(res, req):
@@ -134,7 +134,7 @@ def delete_workspace(request):
 
         Admin.objects.get(
             user__username=request.user.username,
-            workspace__pk=data['id']
+            workspace__pk=data['workspace_id']
         ).delete()
 
         return res
@@ -154,7 +154,7 @@ def rename_workspace(request):
 
         workspace = Admin.objects.get(
             user__username=request.user.username,
-            workspace__pk=data['id']
+            workspace__pk=data['workspace_id']
         ).workspace
 
         workspace.name = data['new_name']
@@ -179,12 +179,12 @@ def get_workspace_members(request):
         members = []
         try:
             members.append(
-                Admin.objects.get(workspace__pk=data['id']).user.username
+                Admin.objects.get(workspace__pk=data['workspace_id']).user.username
             )
         except:
             pass
 
-        members += Member.objects.filter(workspace__pk=data['id']).values_list('user__username')
+        members += Member.objects.filter(workspace__pk=data['workspace_id']).values_list('user__username')
 
         res_data['members'] = ""
         for m in members:
@@ -212,7 +212,7 @@ def get_workspace_boards(request):
             boards.append(
                 Admin.objects.get(
                     user__username=request.user.username,
-                    workspace__pk=data['id']
+                    workspace__pk=data['workspace_id']
                 ).board.name
             )
         except:
@@ -220,12 +220,36 @@ def get_workspace_boards(request):
 
         boards += Member.objects.filter(
                 user__username=request.user.username,
-                workspace__pk=data['id']
+                workspace__pk=data['workspace_id']
             ).values_list('board__name')
 
         res_data['boards'] = ""
         for b in boards:
             res_data['boards'] += b + ','
+
+        res.write(json.dumps(res_data))
+        return res
+
+    res = HttpResponse()
+    res = add_headers(res, request)
+    return res
+
+
+@csrf_exempt
+def add_workspace_board(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        res_data = {}
+
+        res = HttpResponse(content_type="application/json; charset=UTF-8")
+        res = add_headers(res, request)
+
+        workspace = Workspace.objects.get(pk=data["workspace_id"])
+        if Admin.objects.get(user=request.user, workspace=workspace):
+            new_board = Board(
+                workspace=workspace,
+                name=data["name"]
+            ).save()
 
         res.write(json.dumps(res_data))
         return res

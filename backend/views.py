@@ -207,8 +207,13 @@ def get_workspace_boards(request):
         res = HttpResponse(content_type="application/json; charset=UTF-8")
         res = add_headers(res, request)
 
-        boards = []
         try:
+            boards = Board.objects.filter(workspace__pk=data['workspace_id']).values_list('name')
+        except:
+            boards = []
+            pass
+
+        '''try:
             boards.append(
                 Admin.objects.get(
                     user__username=request.user.username,
@@ -221,11 +226,11 @@ def get_workspace_boards(request):
         boards += Member.objects.filter(
                 user__username=request.user.username,
                 workspace__pk=data['workspace_id']
-            ).values_list('board__name')
+            ).values_list('board__name')'''
 
         res_data['boards'] = ""
         for b in boards:
-            res_data['boards'] += b + ','
+            res_data['boards'] += b[0] + ','
 
         res.write(json.dumps(res_data))
         return res
@@ -246,7 +251,7 @@ def add_workspace_board(request):
 
         workspace = Workspace.objects.get(pk=data["workspace_id"])
         if Admin.objects.get(user=request.user, workspace=workspace):
-            new_board = Board(
+            Board(
                 workspace=workspace,
                 name=data["name"]
             ).save()

@@ -6,7 +6,7 @@ from django.http import HttpResponse
 
 from django.views.decorators.csrf import csrf_exempt
 
-from backend.models import Workspace, Admin, Member, Board
+from backend.models import Workspace, Admin, Member, Board, List
 
 
 def add_headers(res, req):
@@ -208,29 +208,16 @@ def get_workspace_boards(request):
         res = add_headers(res, request)
 
         try:
-            boards = Board.objects.filter(workspace__pk=data['workspace_id']).values_list('name')
+            boards = Board.objects.filter(workspace__pk=data['workspace_id']).values_list('pk', 'name')
         except:
             boards = []
             pass
 
-        '''try:
-            boards.append(
-                Admin.objects.get(
-                    user__username=request.user.username,
-                    workspace__pk=data['workspace_id']
-                ).board.name
-            )
-        except:
-            pass
-
-        boards += Member.objects.filter(
-                user__username=request.user.username,
-                workspace__pk=data['workspace_id']
-            ).values_list('board__name')'''
-
         res_data['boards'] = ""
+        res_data['boards_id'] = ""
         for b in boards:
-            res_data['boards'] += b[0] + ','
+            res_data['boards'] += b[1] + ','
+            res_data['boards_id'] += str(b[0]) + ','
 
         res.write(json.dumps(res_data))
         return res
@@ -255,6 +242,145 @@ def add_workspace_board(request):
                 workspace=workspace,
                 name=data["name"]
             ).save()
+
+        res.write(json.dumps(res_data))
+        return res
+
+    res = HttpResponse()
+    res = add_headers(res, request)
+    return res
+
+
+@csrf_exempt
+def delete_workspace_board(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        res_data = {}
+
+        res = HttpResponse(content_type="application/json; charset=UTF-8")
+        res = add_headers(res, request)
+
+        Board.objects.get(
+            pk=data['board_id']
+        ).delete()
+
+        res.write(json.dumps(res_data))
+        return res
+
+    res = HttpResponse()
+    res = add_headers(res, request)
+    return res
+
+
+@csrf_exempt
+def rename_workspace_board(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        res_data = {}
+
+        res = HttpResponse(content_type="application/json; charset=UTF-8")
+        res = add_headers(res, request)
+
+        board = Board.objects.get(
+            pk=data['board_id']
+        )
+        board['name'] = data['name']
+        board.save()
+
+        res.write(json.dumps(res_data))
+        return res
+
+    res = HttpResponse()
+    res = add_headers(res, request)
+    return res
+
+
+@csrf_exempt
+def get_boards_lists(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        res_data = {}
+
+        res = HttpResponse(content_type="application/json; charset=UTF-8")
+        res = add_headers(res, request)
+
+        try:
+            boards = List.objects.filter(board__pk=data['board_id']).values_list('pk', 'name')
+        except:
+            boards = []
+            pass
+
+        res_data['lists'] = ""
+        res_data['lists_id'] = ""
+        for b in boards:
+            res_data['lists'] += b[1] + ','
+            res_data['lists_id'] += str(b[0]) + ','
+
+        res.write(json.dumps(res_data))
+        return res
+
+    res = HttpResponse()
+    res = add_headers(res, request)
+    return res
+
+
+@csrf_exempt
+def add_boards_list(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        res_data = {}
+
+        res = HttpResponse(content_type="application/json; charset=UTF-8")
+        res = add_headers(res, request)
+
+        List(
+            name=data['name'],
+            board=Board.objects.get(pk=data['board_id'])
+        ).save()
+
+        res.write(json.dumps(res_data))
+        return res
+
+    res = HttpResponse()
+    res = add_headers(res, request)
+    return res
+
+
+@csrf_exempt
+def delete_boards_list(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        res_data = {}
+
+        res = HttpResponse(content_type="application/json; charset=UTF-8")
+        res = add_headers(res, request)
+
+        List.objects.get(
+            pk=data['list_id']
+        ).delete()
+
+        res.write(json.dumps(res_data))
+        return res
+
+    res = HttpResponse()
+    res = add_headers(res, request)
+    return res
+
+
+@csrf_exempt
+def rename_boards_list(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        res_data = {}
+
+        res = HttpResponse(content_type="application/json; charset=UTF-8")
+        res = add_headers(res, request)
+
+        list = List.objects.get(
+            pk=data['list_id']
+        )
+        list['name'] = data['name']
+        list.save()
 
         res.write(json.dumps(res_data))
         return res

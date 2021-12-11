@@ -6,7 +6,7 @@ from django.http import HttpResponse
 
 from django.views.decorators.csrf import csrf_exempt
 
-from backend.models import Workspace, Admin, Member, Board, List
+from backend.models import Workspace, Admin, Member, Board, List, Card
 
 
 def add_headers(res, req):
@@ -305,16 +305,23 @@ def get_boards_lists(request):
         res = add_headers(res, request)
 
         try:
-            boards = List.objects.filter(board__pk=data['board_id']).values_list('pk', 'name')
+            lists = List.objects.filter(board__pk=data['board_id']).values_list('pk', 'name')
         except:
-            boards = []
+            lists = []
             pass
 
         res_data['lists'] = []
         res_data['lists_id'] = []
-        for b in boards:
-            res_data['lists'].append(b[1])
-            res_data['lists_id'].append(str(b[0]))
+        res_data['cards'] = []
+        res_data['cards_id'] = []
+        for l in lists:
+            res_data['lists'].append(l[1])
+            res_data['lists_id'].append(str(l[0]))
+
+            cards = Card.objects.filter(list__pk=l[0]).values_list('pk', 'name')
+            for c in cards:
+                res_data['cards'].append(c[1])
+                res_data['cards_id'].append(str(c[0]))
 
         res.write(json.dumps(res_data))
         return res
@@ -379,7 +386,7 @@ def rename_boards_list(request):
         list = List.objects.get(
             pk=data['list_id']
         )
-        list['name'] = data['name']
+        list['new_name'] = data['new_name']
         list.save()
 
         res.write(json.dumps(res_data))

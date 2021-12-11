@@ -84,17 +84,17 @@ def get_workspace(request):
         w_guest = Member.objects.filter(user__username=request.user.username).values_list('workspace__name',
                                                                                           'workspace__pk')
 
-        res_data['admin'] = ""
-        res_data['admin_id'] = ""
+        res_data['admin'] = []
+        res_data['admin_id'] = []
         for w in w_admin:
-            res_data['admin'] += w[0] + ','
-            res_data['admin_id'] += str(w[1]) + ','
+            res_data['admin'].append(w[0])
+            res_data['admin_id'].append(str(w[1]))
 
-        res_data['guest'] = ""
-        res_data['guest_id'] = ""
+        res_data['guest'] = []
+        res_data['guest_id'] = []
         for w in w_guest:
-            res_data['guest'] += w[0] + ','
-            res_data['guest_id'] += str(w[1]) + ','
+            res_data['guest'].append(w[0])
+            res_data['guest_id'].append(str(w[1]))
 
         res.write(json.dumps(res_data))
         return res
@@ -186,9 +186,9 @@ def get_workspace_members(request):
 
         members += Member.objects.filter(workspace__pk=data['workspace_id']).values_list('user__username')
 
-        res_data['members'] = ""
+        res_data['members'] = []
         for m in members:
-            res_data['members'] += m + ','
+            res_data['members'].append(m)
 
         res.write(json.dumps(res_data))
         return res
@@ -213,11 +213,11 @@ def get_workspace_boards(request):
             boards = []
             pass
 
-        res_data['boards'] = ""
-        res_data['boards_id'] = ""
+        res_data['boards'] = []
+        res_data['boards_id'] = []
         for b in boards:
-            res_data['boards'] += b[1] + ','
-            res_data['boards_id'] += str(b[0]) + ','
+            res_data['boards'].append(b[1])
+            res_data['boards_id'].append(str(b[0]))
 
         res.write(json.dumps(res_data))
         return res
@@ -310,11 +310,11 @@ def get_boards_lists(request):
             boards = []
             pass
 
-        res_data['lists'] = ""
-        res_data['lists_id'] = ""
+        res_data['lists'] = []
+        res_data['lists_id'] = []
         for b in boards:
-            res_data['lists'] += b[1] + ','
-            res_data['lists_id'] += str(b[0]) + ','
+            res_data['lists'].append(b[1])
+            res_data['lists_id'].append(str(b[0]))
 
         res.write(json.dumps(res_data))
         return res

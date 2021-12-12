@@ -314,14 +314,16 @@ def get_boards_lists(request):
         res_data['lists_id'] = []
         res_data['cards'] = []
         res_data['cards_id'] = []
-        for l in lists:
+        for il, l in enumerate(lists):
             res_data['lists'].append(l[1])
             res_data['lists_id'].append(str(l[0]))
 
+            res_data['cards'].append([])
+            res_data['cards_id'].append([])
             cards = Card.objects.filter(list__pk=l[0]).values_list('pk', 'name')
             for c in cards:
-                res_data['cards'].append(c[1])
-                res_data['cards_id'].append(str(c[0]))
+                res_data['cards'][il].append(c[1])
+                res_data['cards_id'][il].append(str(c[0]))
 
         res.write(json.dumps(res_data))
         return res

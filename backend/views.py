@@ -388,7 +388,7 @@ def rename_boards_list(request):
         list = List.objects.get(
             pk=data['list_id']
         )
-        list['new_name'] = data['new_name']
+        list.name = data['new_name']
         list.save()
 
         res.write(json.dumps(res_data))

@@ -19,5 +19,5 @@ urlpatterns = [
     path('workspace/boards/lists/rename', views.rename_list),
     path('workspace/boards/lists/cards/add', views.add_card),
     path('workspace/boards/lists/cards/delete', views.delete_card),
-    path('workspace/boards/lists/cards/rename', views.rename_cadr),
+    path('workspace/boards/lists/cards/rename', views.rename_card),
 ]

@@ -397,3 +397,54 @@ def rename_list(request):
     res = HttpResponse()
     res = add_headers(res, request)
     return res
+
+
+@csrf_exempt
+def add_card(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        res_data = {}
+
+        res = HttpResponse(content_type="application/json; charset=UTF-8")
+        res = add_headers(res, request)
+
+        res.write(json.dumps(res_data))
+        return res
+
+    res = HttpResponse()
+    res = add_headers(res, request)
+    return res
+
+
+@csrf_exempt
+def delete_card(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        res_data = {}
+
+        res = HttpResponse(content_type="application/json; charset=UTF-8")
+        res = add_headers(res, request)
+
+        res.write(json.dumps(res_data))
+        return res
+
+    res = HttpResponse()
+    res = add_headers(res, request)
+    return res
+
+
+@csrf_exempt
+def rename_card(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        res_data = {}
+
+        res = HttpResponse(content_type="application/json; charset=UTF-8")
+        res = add_headers(res, request)
+
+        res.write(json.dumps(res_data))
+        return res
+
+    res = HttpResponse()
+    res = add_headers(res, request)
+    return res

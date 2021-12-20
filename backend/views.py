@@ -408,6 +408,11 @@ def add_card(request):
         res = HttpResponse(content_type="application/json; charset=UTF-8")
         res = add_headers(res, request)
 
+        Card(
+            name=data['name'],
+            list=List.objects.get(pk=data['list_id'])
+        ).save()
+
         res.write(json.dumps(res_data))
         return res
 
@@ -425,6 +430,11 @@ def delete_card(request):
         res = HttpResponse(content_type="application/json; charset=UTF-8")
         res = add_headers(res, request)
 
+        Card(
+            name=data['name'],
+            list=List.objects.get(pk=data['list_id'])
+        ).delete()
+
         res.write(json.dumps(res_data))
         return res
 
@@ -441,6 +451,12 @@ def rename_card(request):
 
         res = HttpResponse(content_type="application/json; charset=UTF-8")
         res = add_headers(res, request)
+
+        card = Card(
+            pk=data['card_id']
+        )
+        card.name = data['new_name']
+        card.save()
 
         res.write(json.dumps(res_data))
         return res

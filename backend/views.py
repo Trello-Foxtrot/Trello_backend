@@ -199,7 +199,7 @@ def get_workspace_members(request):
 
 
 @csrf_exempt
-def get_workspace_boards(request):
+def get_boards(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         res_data = {}
@@ -228,7 +228,7 @@ def get_workspace_boards(request):
 
 
 @csrf_exempt
-def add_workspace_board(request):
+def add_board(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         res_data = {}
@@ -252,7 +252,7 @@ def add_workspace_board(request):
 
 
 @csrf_exempt
-def delete_workspace_board(request):
+def delete_board(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         res_data = {}
@@ -273,7 +273,7 @@ def delete_workspace_board(request):
 
 
 @csrf_exempt
-def rename_workspace_board(request):
+def rename_board(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         res_data = {}
@@ -296,7 +296,7 @@ def rename_workspace_board(request):
 
 
 @csrf_exempt
-def get_boards_lists(request):
+def get_lists(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         res_data = {}
@@ -334,7 +334,7 @@ def get_boards_lists(request):
 
 
 @csrf_exempt
-def add_boards_list(request):
+def add_list(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         res_data = {}
@@ -356,7 +356,7 @@ def add_boards_list(request):
 
 
 @csrf_exempt
-def delete_boards_list(request):
+def delete_list(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         res_data = {}
@@ -377,7 +377,7 @@ def delete_boards_list(request):
 
 
 @csrf_exempt
-def rename_boards_list(request):
+def rename_list(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         res_data = {}

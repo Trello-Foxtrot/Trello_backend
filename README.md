@@ -1,4 +1,5 @@
 # Trello_backend
+pip install django-sslserver
 python manage.py runsslserver --certificate cert.pem --key key.pem
 
 https://github.com/FiloSottile/mkcert/releases

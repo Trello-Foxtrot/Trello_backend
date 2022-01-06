@@ -284,7 +284,7 @@ def rename_board(request):
         board = Board.objects.get(
             pk=data['board_id']
         )
-        board['name'] = data['name']
+        board.name = data['new_name']
         board.save()
 
         res.write(json.dumps(res_data))
@@ -308,7 +308,6 @@ def get_lists(request):
             lists = List.objects.filter(board__pk=data['board_id']).values_list('pk', 'name')
         except:
             lists = []
-            pass
 
         res_data['lists'] = []
         res_data['lists_id'] = []
@@ -430,9 +429,8 @@ def delete_card(request):
         res = HttpResponse(content_type="application/json; charset=UTF-8")
         res = add_headers(res, request)
 
-        Card(
-            name=data['name'],
-            list=List.objects.get(pk=data['list_id'])
+        Card.objects.get(
+            pk=data['card_id']
         ).delete()
 
         res.write(json.dumps(res_data))
@@ -452,7 +450,7 @@ def rename_card(request):
         res = HttpResponse(content_type="application/json; charset=UTF-8")
         res = add_headers(res, request)
 
-        card = Card(
+        card = Card.objects.get(
             pk=data['card_id']
         )
         card.name = data['new_name']

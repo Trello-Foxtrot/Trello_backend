@@ -18,7 +18,7 @@ class List(models.Model):
 
 class Card(models.Model):
     name = models.CharField(max_length=200)
-    list = models.ForeignKey(List, on_delete=models.CASCADE, null=True)
+    list = models.ForeignKey(List, on_delete=models.CASCADE)
 
 
 class Admin(models.Model):

@@ -598,6 +598,8 @@ def set_date(request):
 
 @csrf_exempt
 def add_attachment(request):
+    # TODO tu trzeba odebrać i zapisać plik
+    #  np. przez odbieranie danych z data['file'] albo inaczej jeżeli się da prościej
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         res_data = {}

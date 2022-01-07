@@ -20,4 +20,11 @@ urlpatterns = [
     path('workspace/boards/lists/cards/add', views.add_card),
     path('workspace/boards/lists/cards/delete', views.delete_card),
     path('workspace/boards/lists/cards/rename', views.rename_card),
+    path('workspace/boards/lists/cards', views.get_card),
+    path('workspace/boards/lists/cards/redescribe', views.redescribe_card),
+    path('workspace/boards/lists/cards/comments/add', views.add_comment),
+    path('workspace/boards/lists/cards/comments/delete', views.delete_comment),
+    path('workspace/boards/lists/cards/date', views.set_date),
+    path('workspace/boards/lists/cards/attachment/add', views.add_attachment),
+    path('workspace/boards/lists/cards/attachment/delete', views.delete_attachment),
 ]

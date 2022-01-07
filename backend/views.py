@@ -1,19 +1,21 @@
 import json
 
+from dateutil import parser
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 
 from django.views.decorators.csrf import csrf_exempt
 
-from backend.models import Workspace, Admin, Member, Board, List, Card
+from backend.models import Workspace, Admin, Member, Board, List, Card, Comment, Attachment
 
 
 def add_headers(res, req):
     res['Access-Control-Allow-Origin'] = req.headers['Origin']
     res['Access-Control-Expose-Headers'] = '*'
     res['Access-Control-Allow-Credentials'] = 'true'
-    res['Access-Control-Allow-Headers'] = 'access-control-allow-origin, access-control-expose-headers, access-control-allow-credentials, content-type'
+    res[
+        'Access-Control-Allow-Headers'] = 'access-control-allow-origin, access-control-expose-headers, access-control-allow-credentials, content-type'
     return res
 
 
@@ -80,7 +82,8 @@ def get_workspace(request):
         res = HttpResponse(content_type="application/json; charset=UTF-8")
         res = add_headers(res, request)
 
-        w_admin = Admin.objects.filter(user__username=request.user.username).values_list('workspace__name', 'workspace__pk')
+        w_admin = Admin.objects.filter(user__username=request.user.username).values_list('workspace__name',
+                                                                                         'workspace__pk')
         w_guest = Member.objects.filter(user__username=request.user.username).values_list('workspace__name',
                                                                                           'workspace__pk')
 
@@ -409,7 +412,7 @@ def add_card(request):
 
         Card(
             name=data['name'],
-            list=List.objects.get(pk=data['list_id'])
+            list=List.objects.get(pk=data['list_id']),
         ).save()
 
         res.write(json.dumps(res_data))
@@ -455,6 +458,178 @@ def rename_card(request):
         )
         card.name = data['new_name']
         card.save()
+
+        res.write(json.dumps(res_data))
+        return res
+
+    res = HttpResponse()
+    res = add_headers(res, request)
+    return res
+
+
+@csrf_exempt
+def get_card(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        res_data = {}
+
+        res = HttpResponse(content_type="application/json; charset=UTF-8")
+        res = add_headers(res, request)
+
+        card = Card.objects.get(
+            pk=data['card_id']
+        )
+        comments = Comment.objects.filter(
+            card_id=data['card_id']
+        )
+        attachments = Attachment.objects.filter(
+            card_id=data['card_id']
+        )
+
+        res_data['comments'] = [[c.user.email, c.text, str(c.id)] for c in comments]
+        res_data['description'] = card.description
+        res_data['attachments'] = [[a.name, str(a.id)] for a in attachments]
+
+        if card.date is None:
+            res_data['date'] = ""
+        else:
+            res_data['date'] = str(card.date)
+
+        res.write(json.dumps(res_data))
+        return res
+
+    res = HttpResponse()
+    res = add_headers(res, request)
+    return res
+
+
+@csrf_exempt
+def redescribe_card(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        res_data = {}
+
+        res = HttpResponse(content_type="application/json; charset=UTF-8")
+        res = add_headers(res, request)
+
+        card = Card.objects.get(
+            pk=data['card_id']
+        )
+        card.description = data['new_description']
+        card.save()
+
+        res.write(json.dumps(res_data))
+        return res
+
+    res = HttpResponse()
+    res = add_headers(res, request)
+    return res
+
+
+@csrf_exempt
+def add_comment(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        res_data = {}
+
+        res = HttpResponse(content_type="application/json; charset=UTF-8")
+        res = add_headers(res, request)
+
+        Comment(
+            text=data['text'],
+            card=Card.objects.get(pk=data['card_id']),
+            user=request.user
+        ).save()
+
+        res.write(json.dumps(res_data))
+        return res
+
+    res = HttpResponse()
+    res = add_headers(res, request)
+    return res
+
+
+@csrf_exempt
+def delete_comment(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        res_data = {}
+
+        res = HttpResponse(content_type="application/json; charset=UTF-8")
+        res = add_headers(res, request)
+
+        Comment.objects.get(
+            pk=data['comment_id']
+        ).delete()
+
+        res.write(json.dumps(res_data))
+        return res
+
+    res = HttpResponse()
+    res = add_headers(res, request)
+    return res
+
+
+@csrf_exempt
+def set_date(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        res_data = {}
+
+        res = HttpResponse(content_type="application/json; charset=UTF-8")
+        res = add_headers(res, request)
+
+        card = Card.objects.get(
+            pk=data['card_id']
+        )
+        if data['datetime'] != "":
+            card.date = parser.parse(data['datetime'])
+        else:
+            card.date = None
+        card.save()
+
+        res.write(json.dumps(res_data))
+        return res
+
+    res = HttpResponse()
+    res = add_headers(res, request)
+    return res
+
+
+@csrf_exempt
+def add_attachment(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        res_data = {}
+
+        res = HttpResponse(content_type="application/json; charset=UTF-8")
+        res = add_headers(res, request)
+
+        Attachment(
+            name=data['name'],
+            card_id=data['card_id'],
+        ).save()
+
+        res.write(json.dumps(res_data))
+        return res
+
+    res = HttpResponse()
+    res = add_headers(res, request)
+    return res
+
+
+@csrf_exempt
+def delete_attachment(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        res_data = {}
+
+        res = HttpResponse(content_type="application/json; charset=UTF-8")
+        res = add_headers(res, request)
+
+        Attachment(
+            pk=data['attachment_id'],
+        ).delete()
 
         res.write(json.dumps(res_data))
         return res

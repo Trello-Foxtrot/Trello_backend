@@ -610,6 +610,7 @@ def add_attachment(request):
         Attachment(
             name=data['name'],
             card_id=data['card_id'],
+            file=data['file'],
         ).save()
 
         res.write(json.dumps(res_data))

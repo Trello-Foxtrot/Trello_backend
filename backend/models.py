@@ -26,6 +26,7 @@ class Card(models.Model):
 class Attachment(models.Model):
     name = models.CharField(max_length=256)
     card = models.ForeignKey(Card, on_delete=models.CASCADE)
+    file = models.FileField(null=True, blank=True, upload_to='/media/')
 
 
 class Comment(models.Model):

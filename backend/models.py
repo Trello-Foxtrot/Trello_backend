@@ -26,13 +26,13 @@ class Card(models.Model):
 class Attachment(models.Model):
     name = models.CharField(max_length=256)
     card = models.ForeignKey(Card, on_delete=models.CASCADE)
-    file = models.FileField(null=True, blank=True, upload_to='/media/')
+    file = models.FileField(null=True, blank=True, upload_to='media/')
 
 
 class Comment(models.Model):
     text = models.CharField(max_length=256)
     card = models.ForeignKey(Card, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
 
 class Admin(models.Model):

@@ -1,8 +1,11 @@
+import base64
 import json
+from io import BytesIO
 
 from dateutil import parser
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
+from django.core.files import File
 from django.http import HttpResponse
 
 from django.views.decorators.csrf import csrf_exempt
@@ -598,8 +601,6 @@ def set_date(request):
 
 @csrf_exempt
 def add_attachment(request):
-    # TODO tu trzeba odebrać i zapisać plik
-    #  np. przez odbieranie danych z data['file'] albo inaczej jeżeli się da prościej
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         res_data = {}
@@ -610,7 +611,7 @@ def add_attachment(request):
         Attachment(
             name=data['name'],
             card_id=data['card_id'],
-            file=data['file'],
+            file=File(BytesIO(base64.b64decode(data['file'])), name=data['name']),
         ).save()
 
         res.write(json.dumps(res_data))
